@@ -15,6 +15,7 @@ LOG = logging.getLogger(__name__)
 
 
 @pytest.mark.parametrize("operating_system", [os.environ["OPERATING_SYSTEM"]], indirect=True)
+@pytest.mark.order(2)
 class TestWorkerStatus:
     def test_worker_lifecycle_status_is_expected(
         self,

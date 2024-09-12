@@ -29,6 +29,7 @@ LOG = logging.getLogger(__name__)
     reason="Windows Specific Job User Override Tests.",
 )
 @pytest.mark.parametrize("operating_system", ["windows"], indirect=True)
+@pytest.mark.order(1)
 class TestJobUserOverride:
     @staticmethod
     def submit_whoami_job(
