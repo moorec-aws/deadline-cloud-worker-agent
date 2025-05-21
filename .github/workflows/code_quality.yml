@@ -8,6 +8,9 @@ on:
       branch:
         required: false
         type: string
+      tag:
+        required: false
+        type: string
 
 jobs:
   UnitTest:
@@ -16,10 +19,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
-    uses: aws-deadline/.github/.github/workflows/reusable_python_build.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_python_build.yml@mainline
     with:
       os: ${{ matrix.os }}
       python-version: ${{ matrix.python-version }}
+      ref: ${{inputs.tag}}
 
   IntegrationTests:
     name: Integration Tests
@@ -33,6 +37,8 @@ jobs:
         python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.tag || inputs.branch || github.ref }}
     
     - name: Install Hatch
       run: |
