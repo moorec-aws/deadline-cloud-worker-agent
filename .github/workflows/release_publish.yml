@@ -1,28 +1,139 @@
 name: "Release: Publish"
-run-name: "Release: ${{ github.event.head_commit.message }}"
+run-name: "Release: ${{ inputs.tag }}"
 
 on:
-  push:
-    branches:
-      - mainline
-    paths:
-      - CHANGELOG.md
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        type: string
 
 concurrency:
   group: release
 
+permissions:
+  contents: read
+
 jobs:
-  Publish:
-    name: Publish Release
+  ReleaseCheck:
+    uses: moorec-aws/.github/.github/workflows/reusable_release_check.yml@mainline
+    secrets:
+      EMAIL: ${{ secrets.EMAIL }}
+    with:
+      tag: ${{ inputs.tag }}
+  
+  UnitIntegTests:
+    needs: ReleaseCheck
+    name: Unit and Integration Tests
+    if: false  # This will always skip this job
+    uses: ./.github/workflows/code_quality.yml
+    with:
+      tag: ${{inputs.tag}}
+
+  LinuxE2ETests:
+    needs: [ReleaseCheck]
+    name: Linux E2E Test
+    permissions:
+      id-token: write
+      contents: read
+    if: false  # This will always skip this job
+    uses: moorec-aws/.github/.github/workflows/reusable_e2e_test.yml@mainline
+    secrets: inherit
+    with:
+      repository: ${{ github.event.repository.name }}
+      branch: mainline
+      environment: mainline
+      os: linux
+      tag: ${{inputs.tag}}
+    concurrency:
+      group: linuxe2e
+
+  WindowsE2ETests:
+    needs: [ReleaseCheck]
+    name: Windows E2E Test
+    permissions:
+      id-token: write
+      contents: read
+    if: false  # This will always skip this job
+    uses: moorec-aws/.github/.github/workflows/reusable_e2e_test.yml@mainline
+    secrets: inherit
+    with:
+      repository: ${{ github.event.repository.name }}
+      branch: mainline
+      environment: mainline
+      os: windows
+      tag: ${{inputs.tag}}
+    concurrency:
+      group: windowse2e
+
+  PreRelease:
+    needs: [ReleaseCheck]
+    uses: moorec-aws/.github/.github/workflows/reusable_prerelease.yml@mainline
     permissions:
       id-token: write
       contents: write
-    uses: aws-deadline/.github/.github/workflows/reusable_publish.yml@mainline
     secrets: inherit
+    with:
+        tag: ${{inputs.tag}}
+   
+  # Updates the release branch to the latest tagged release for running canaries
+  PushToReleaseBranch:
+    runs-on: ubuntu-latest
+    needs: [PreRelease]
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.CI_TOKEN }}
+          
+      - name: Configure Git
+        run: |
+          git config user.name ${{ secrets.USER }}
+          git config user.email ${{ secrets.EMAIL }}
+          
+      - name: Update Release Branch
+        run: |
+          # Fetch all branches and tags
+          git fetch --all --tags
+          
+          # Checkout the tag we're releasing
+          git checkout ${{inputs.tag}}
+          
+          # Create or reset the release branch to point to this tag
+          git branch -f release ${{inputs.tag}}
+          
+          # Push the updated release branch
+          git push origin release --force
+
+  Release:
+      needs: PreRelease
+      uses: moorec-aws/.github/.github/workflows/reusable_release.yml@mainline
+      permissions:
+        id-token: write
+        contents: write
+      secrets: inherit
+      with:
+          tag: ${{inputs.tag}}
+  
+  Publish:
+    needs: Release
+    if: false  # This will always skip this job
+    uses: moorec-aws/.github/.github/workflows/reusable_publish_python.yml@mainline
+    permissions:
+      id-token: write
+    secrets: inherit
+    with:
+        tag: ${{inputs.tag}}
+
   # PyPI does not support reusable workflows yet
   # # See https://github.com/pypi/warehouse/issues/11096
   PublishToPyPI:
     needs: Publish
+    if: false  # This will always skip this job
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -31,7 +142,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: release
+          ref: ${{inputs.tag}}
           fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v5
