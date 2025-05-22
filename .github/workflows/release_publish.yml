@@ -76,7 +76,7 @@ jobs:
     with:
         tag: ${{inputs.tag}}
    
-  # Updates the release branch to the latest tagged release for running canaries
+  # Updates the release branch to the latest tagged release for running
   PushToReleaseBranch:
     runs-on: ubuntu-latest
     needs: [PreRelease]
