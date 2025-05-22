@@ -1,3 +1,10 @@
+## 0.3.0 (2025-05-22)
+
+
+
+### Bug Fixes
+* Another Fantastical Release ([`73e03e8`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/73e03e822598a9af517bb8bb113be73f211f9c1b))
+
 ## 0.2.1 (2025-05-22)
 
 
