@@ -41,7 +41,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: aws-deadline/.github/.github/workflows/reusable_e2e_test.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_e2e_test.yml@mainline
     secrets: inherit
     with:
       repository: ${{ github.event.repository.name }}
@@ -59,7 +59,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-    uses: aws-deadline/.github/.github/workflows/reusable_e2e_test.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_e2e_test.yml@mainline
     secrets: inherit
     with:
       repository: ${{ github.event.repository.name }}
@@ -72,7 +72,7 @@ jobs:
 
   PreRelease:
     needs: [UnitIntegTests]
-    uses: aws-deadline/.github/.github/workflows/reusable_prerelease.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_prerelease.yml@mainline
     permissions:
       id-token: write
       contents: write
@@ -115,7 +115,7 @@ jobs:
 
   Release:
       needs: [PreRelease, PushToReleaseBranch]
-      uses: aws-deadline/.github/.github/workflows/reusable_release.yml@mainline
+      uses: moorec-aws/.github/.github/workflows/reusable_release.yml@mainline
       permissions:
         id-token: write
         contents: write
@@ -126,7 +126,7 @@ jobs:
   Publish:
     if: false  # This job will always be skipped
     needs: Release
-    uses: aws-deadline/.github/.github/workflows/reusable_publish_python.yml@mainline
+    uses: moorec-aws/.github/.github/workflows/reusable_publish_python.yml@mainline
     permissions:
       id-token: write
     secrets: inherit
