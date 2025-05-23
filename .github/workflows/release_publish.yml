@@ -1,12 +1,18 @@
 name: "Release: Publish"
-run-name: "Release: ${{ inputs.tag }}"
+run-name: "Release: ${{ github.event.head_commit.message || inputs.tag }}"
 
 on:
+  push:
+    branches:
+      - mainline
+    paths:
+      - CHANGELOG.md
   workflow_dispatch:
     inputs:
       tag:
         required: true
         type: string
+        description: Specify a tag to re-run a release.
 
 concurrency:
   group: release
@@ -15,22 +21,21 @@ permissions:
   contents: read
 
 jobs:
-  ReleaseCheck:
-    uses: aws-deadline/.github/.github/workflows/reusable_release_check.yml@mainline
-    secrets:
-      EMAIL: ${{ secrets.EMAIL }}
+  TagRelease:
+    uses: ./.github/workflows/reusable_tag_release.yml
+    secrets: inherit
     with:
-      tag: ${{ inputs.tag }}
+      tag: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || '' }}
   
   UnitIntegTests:
-    needs: ReleaseCheck
+    needs: [TagRelease]
     name: Unit and Integration Tests
     uses: ./.github/workflows/code_quality.yml
     with:
-      tag: ${{inputs.tag}}
+      tag: ${{ needs.TagRelease.outputs.tag }}
 
   LinuxE2ETests:
-    needs: [ReleaseCheck, UnitIntegTests]
+    needs: [UnitIntegTests]
     name: Linux E2E Test
     permissions:
       id-token: write
@@ -42,12 +47,12 @@ jobs:
       branch: mainline
       environment: mainline
       os: linux
-      tag: ${{inputs.tag}}
+      tag: ${{ needs.TagRelease.outputs.tag }}
     concurrency:
       group: linuxe2e
 
   WindowsE2ETests:
-    needs: [ReleaseCheck, UnitIntegTests]
+    needs: [UnitIntegTests]
     name: Windows E2E Test
     permissions:
       id-token: write
@@ -59,19 +64,19 @@ jobs:
       branch: mainline
       environment: mainline
       os: windows
-      tag: ${{inputs.tag}}
+      tag: ${{ needs.TagRelease.outputs.tag }}
     concurrency:
       group: windowse2e
 
   PreRelease:
-    needs: [ReleaseCheck, UnitIntegTests]
+    needs: [UnitIntegTests]
     uses: aws-deadline/.github/.github/workflows/reusable_prerelease.yml@mainline
     permissions:
       id-token: write
       contents: write
     secrets: inherit
     with:
-        tag: ${{inputs.tag}}
+        tag: ${{ needs.TagRelease.outputs.tag }}
    
   # Updates the release branch to the latest tagged release for running canaries
   PushToReleaseBranch:
@@ -98,10 +103,10 @@ jobs:
           git fetch --all --tags
           
           # Checkout the tag we're releasing
-          git checkout ${{inputs.tag}}
+          git checkout ${{ needs.TagRelease.outputs.tag }}
           
           # Create or reset the release branch to point to this tag
-          git branch -f release ${{inputs.tag}}
+          git branch -f release ${{ needs.TagRelease.outputs.tag }}
           
           # Push the updated release branch
           git push origin release --force
@@ -114,7 +119,7 @@ jobs:
         contents: write
       secrets: inherit
       with:
-          tag: ${{inputs.tag}}
+          tag: ${{ needs.TagRelease.outputs.tag }}
   
   Publish:
     needs: Release
@@ -123,7 +128,7 @@ jobs:
       id-token: write
     secrets: inherit
     with:
-        tag: ${{inputs.tag}}
+        tag: ${{ needs.TagRelease.outputs.tag }}
 
   # PyPI does not support reusable workflows yet
   # # See https://github.com/pypi/warehouse/issues/11096
@@ -137,7 +142,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{inputs.tag}}
+          ref: ${{ needs.TagRelease.outputs.tag }}
           fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@v5
