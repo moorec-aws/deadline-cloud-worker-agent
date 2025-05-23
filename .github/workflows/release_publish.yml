@@ -28,7 +28,6 @@ jobs:
       tag: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || '' }}
   
   UnitIntegTests:
-    if: false  # This job will always be skipped
     needs: [TagRelease]
     name: Unit and Integration Tests
     uses: ./.github/workflows/code_quality.yml
@@ -72,7 +71,7 @@ jobs:
       group: windowse2e
 
   PreRelease:
-    needs: [TagRelease]
+    needs: [TagRelease, UnitIntegTests]
     uses: moorec-aws/.github/.github/workflows/reusable_prerelease.yml@mainline
     permissions:
       id-token: write
