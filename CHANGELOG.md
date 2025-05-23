@@ -1,3 +1,17 @@
+## 0.29.0 (2025-05-23)
+
+
+### Features
+* Launch Host Configuration feature (#636) ([`dd2071d`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/dd2071d1d01d6cd811531bc1d689c114a7e760e5))
+* **experimental**: add support for chunkInt parameter type ([`4c517b4`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/4c517b4a37c35ee4cc8c1ba79bfc6bc1cb29f250))
+
+### Bug Fixes
+* stuff ([`cb4c97f`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/cb4c97f45435e8f6b0b1c55dab89b6a0f5ff95c5))
+* **experimental**: Job Attachment repeatedly upload output from previous tasks in the same session (#631) ([`600c2e2`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/600c2e2b9d86f1b8c70df52fefec2adb6258f18f))
+* Cleanup log file before starting host config if the file already exists (#634) ([`6466c4f`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/6466c4fbd509867f877a17af1a4a95693590808b))
+* **ASSET_SYNC_JOB_USER_FEATURE**: NonValidInputError failures and uploading files from input job attachment directories (#612) ([`4c12664`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/4c126648a657df83e065c77274c965b8d0ad283e))
+* Worker Agent Crashes on corrupted cached credentials (#614) ([`7f1ec05`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/7f1ec05d86035febd68daffa603d8da404b8854a))
+
 ## 0.28.7 (2025-05-21)
 
 
