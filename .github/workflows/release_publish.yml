@@ -35,7 +35,6 @@ jobs:
       tag: ${{ needs.TagRelease.outputs.tag }}
 
   LinuxE2ETests:
-    if: false  # This job will always be skipped
     needs: [TagRelease, UnitIntegTests]
     name: Linux E2E Test
     permissions:
@@ -53,7 +52,6 @@ jobs:
       group: linuxe2e
 
   WindowsE2ETests:
-    if: false  # This job will always be skipped
     needs: [TagRelease, UnitIntegTests]
     name: Windows E2E Test
     permissions:
@@ -71,7 +69,7 @@ jobs:
       group: windowse2e
 
   PreRelease:
-    needs: [TagRelease, UnitIntegTests]
+    needs: [TagRelease, WindowsE2ETests, LinuxE2ETests]
     uses: moorec-aws/.github/.github/workflows/reusable_prerelease.yml@mainline
     permissions:
       id-token: write
