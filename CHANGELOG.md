@@ -1,3 +1,10 @@
+## 0.30.0 (2025-05-26)
+
+
+
+### Bug Fixes
+* test release ([`bb91385`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/bb91385ccb9ed3c3b93a764d3b9de1430c96bb2e))
+
 ## 0.29.1 (2025-05-23)
 
 
