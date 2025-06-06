@@ -44,7 +44,6 @@ jobs:
     secrets: inherit
     with:
       repository: ${{ github.event.repository.name }}
-      branch: mainline
       environment: mainline
       os: linux
       tag: ${{ needs.TagRelease.outputs.tag }}
@@ -61,7 +60,6 @@ jobs:
     secrets: inherit
     with:
       repository: ${{ github.event.repository.name }}
-      branch: mainline
       environment: mainline
       os: windows
       tag: ${{ needs.TagRelease.outputs.tag }}
