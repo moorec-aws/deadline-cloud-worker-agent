@@ -1,3 +1,13 @@
+## 0.29.0 (2025-06-06)
+
+
+
+### Bug Fixes
+* fix ([`4db35e6`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/4db35e638142186dca37845659c3e93a8a1e9966))
+* **experimental**: Job output download takes old session action ouput when there is a rerun (#641) ([`d42efc5`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/d42efc52f30ef56a6b24e6d6c529deb74c7adc3b))
+* Disk Read/Write Bytes per Second Metrics Always Increases (#653) ([`e56a58a`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/e56a58a7b04a772bf844904486714f3dad5619d4))
+* **experimental**: Job Attachment repeatedly upload output from previous tasks in the same session (#631) ([`a0c504a`](https://github.com/moorec-aws/deadline-cloud-worker-agent/commit/a0c504a8e011a661a4f348ed83a6a4373d1669c0))
+
 ## 0.28.9 (2025-06-05)
 
 
